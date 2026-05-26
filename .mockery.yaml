@@ -1,0 +1,47 @@
+with-expecter: true
+disable-version-string: true
+resolve-type-alias: false
+issue-845-fix: true
+
+dir: "{{.InterfaceDir}}/mocks"
+outpkg: mocks
+
+filename: "mock_{{.InterfaceName}}.go"
+mockname: "Mock{{.InterfaceName}}"
+
+packages:
+  zchat/internal/auth:
+    interfaces:
+      AccessTokenValidator:
+      TokenRepository:
+      UserRepository:
+      TokenGenerator:
+
+  zchat/internal/chat:
+    interfaces:
+      ChannelAccess:
+      Publisher:
+      Repository:
+      UserLookup:
+
+  zchat/internal/group:
+    interfaces:
+      Cache:
+      Repository:
+      UserLookup:
+
+  zchat/internal/realtime:
+    interfaces:
+      Store:
+
+  zchat/internal/realtime/ws:
+    interfaces:
+      ChatService:
+      GroupService:
+      RealtimeBus:
+      VoiceAudit:
+
+  zchat/internal/voice:
+    interfaces:
+      ChannelLookup:
+      Repository:
