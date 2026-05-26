@@ -2,6 +2,8 @@ package app
 
 import (
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"go.uber.org/zap"
 
 	"zchat/internal/auth"
@@ -19,7 +21,7 @@ func newRouter(log *zap.Logger, jwt auth.AccessTokenValidator, registrars []rout
 	router.Use(gin.Recovery(), httpapi.RequestLogger(log))
 
 	router.GET("/health", func(c *gin.Context) { c.JSON(200, gin.H{"status": "ok"}) })
-
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	v1 := router.Group("/api/v1")
 	public := v1.Group("/")
 	protected := v1.Group("/")

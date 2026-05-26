@@ -22,6 +22,21 @@ func (h *Handler) RegisterRoutes(_ *gin.RouterGroup, protected *gin.RouterGroup)
 	protected.GET("/groups/:group_id/channels/:channel_id/voice-moderation-events", h.listEvents)
 }
 
+// GetVoiceModerationEvents godoc
+// @Summary      Get voice moderation history for a voice channel
+// @Tags         channels
+// @Security     BearerAuth
+// @Param        group_id path string true "Group ID"
+// @Param        channel_id path string true "Voice Channel ID"
+// @Param        limit query int false "Events per page" default(50)
+// @Param        cursor query string false "Pagination cursor"
+// @Param        from query string false "Start time (RFC3339)" example("2023-01-01T00:00:00Z")
+// @Param        to query string false "End time (RFC3339)"
+// @Success      200  {object}  voice.ListEventsResponse
+// @Failure      400  {object}  httpapi.ErrorResponse
+// @Failure      401  {object}  httpapi.ErrorResponse
+// @Failure      403  {object}  httpapi.ErrorResponse  "Not voice channel"
+// @Router       /groups/{group_id}/channels/{channel_id}/voice-moderation-events [get]
 func (h *Handler) listEvents(c *gin.Context) {
 	userID, ok := auth.RequireUserID(c)
 	if !ok {

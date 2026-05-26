@@ -2,36 +2,45 @@ package chat
 
 import "time"
 
+// CreateDirectChatRequest for POST /direct-chats
 type CreateDirectChatRequest struct {
-	UserID string `json:"user_id" binding:"required,uuid"`
+	// User ID of the other participant (UUID format)
+	UserID string `json:"user_id" binding:"required,uuid" example:"550e8400-e29b-41d4-a716-446655440000" description:"Target user ID"`
 }
 
+// SendMessageRequest for POST /channels/:channel_id/messages and direct chats
 type SendMessageRequest struct {
-	Content string `json:"content" binding:"required,min=1,max=4000"`
+	// Message content, min 1, max 4000 characters
+	Content string `json:"content" binding:"required,min=1,max=4000" example:"Hello, world!" description:"Text content of the message"`
 }
 
+// MarkMessageReadRequest for POST /channels/:channel_id/read and direct reads
 type MarkMessageReadRequest struct {
-	MessageID string `json:"message_id" binding:"required,uuid"`
+	// ID of the message being marked as read
+	MessageID string `json:"message_id" binding:"required,uuid" example:"550e8400-e29b-41d4-a716-446655440000"`
 }
 
+// DirectChatResponse returned for direct chat creation/GET
 type DirectChatResponse struct {
-	ID string `json:"id"`
+	ID string `json:"id" example:"direct-12345" description:"Direct chat unique identifier"`
 }
 
+// MessageResponse for messages (channel or direct)
 type MessageResponse struct {
-	ID           string     `json:"id"`
-	SenderID     string     `json:"sender_id"`
-	ChannelID    *string    `json:"channel_id,omitempty"`
-	DirectChatID *string    `json:"direct_chat_id,omitempty"`
-	Content      string     `json:"content"`
-	CreatedAt    *time.Time `json:"created_at,omitempty"`
+	ID           string     `json:"id" example:"msg-123" description:"Message UUID"`
+	SenderID     string     `json:"sender_id" example:"user-789" description:"User ID of the sender"`
+	ChannelID    *string    `json:"channel_id,omitempty" description:"If the message belongs to a group channel, the channel ID"`
+	DirectChatID *string    `json:"direct_chat_id,omitempty" description:"If the message belongs to a direct chat, the direct chat ID"`
+	Content      string     `json:"content" example:"Hello!" description:"Message text"`
+	CreatedAt    *time.Time `json:"created_at,omitempty" example:"2025-01-15T12:34:56Z"`
 }
 
+// ReceiptResponse for message delivery/read receipts
 type ReceiptResponse struct {
-	MessageID   string     `json:"message_id"`
-	UserID      string     `json:"user_id"`
-	DeliveredAt *time.Time `json:"delivered_at,omitempty"`
-	ReadAt      *time.Time `json:"read_at,omitempty"`
+	MessageID   string     `json:"message_id" example:"msg-123"`
+	UserID      string     `json:"user_id" example:"user-789"`
+	DeliveredAt *time.Time `json:"delivered_at,omitempty" example:"2025-01-15T12:34:56Z"`
+	ReadAt      *time.Time `json:"read_at,omitempty" example:"2025-01-15T12:35:00Z"`
 }
 
 func toDirectChatResponse(c *DirectChat) DirectChatResponse {

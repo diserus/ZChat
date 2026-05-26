@@ -28,6 +28,17 @@ func (h *Handler) RegisterRoutes(_ *gin.RouterGroup, protected *gin.RouterGroup)
 	protected.POST("/groups/:group_id/channels", h.createChannel)
 }
 
+// CreateGroup godoc
+// @Summary      Create a new group
+// @Tags         groups
+// @Security     BearerAuth
+// @Accept       json
+// @Produce      json
+// @Param        request body CreateGroupRequest true "Group name"
+// @Success      201  {object}  GroupResponse
+// @Failure      400  {object}  httpapi.ErrorResponse
+// @Failure      401  {object}  httpapi.ErrorResponse
+// @Router       /groups [post]
 func (h *Handler) createGroup(c *gin.Context) {
 	userID, ok := auth.RequireUserID(c)
 	if !ok {
@@ -46,6 +57,14 @@ func (h *Handler) createGroup(c *gin.Context) {
 	c.JSON(http.StatusCreated, toGroupResponse(g))
 }
 
+// ListGroups godoc
+// @Summary      List user groups
+// @Description  Returns all groups the authenticated user belongs to
+// @Tags         groups
+// @Security     BearerAuth
+// @Success      200  {object}  map[string]interface{}  "{\"groups\": [...]}"
+// @Failure      401  {object}  httpapi.ErrorResponse
+// @Router       /groups [get]
 func (h *Handler) listGroups(c *gin.Context) {
 	userID, ok := auth.RequireUserID(c)
 	if !ok {
@@ -59,6 +78,16 @@ func (h *Handler) listGroups(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"groups": toGroupsResponse(groups)})
 }
 
+// ListMembers godoc
+// @Summary      List group members
+// @Tags         groups
+// @Security     BearerAuth
+// @Param        group_id path string true "Group ID"
+// @Success      200  {object}  map[string]interface{}  "{\"members\": [...]}"
+// @Failure      400  {object}  httpapi.ErrorResponse
+// @Failure      401  {object}  httpapi.ErrorResponse
+// @Failure      403  {object}  httpapi.ErrorResponse  "Not a member"
+// @Router       /groups/{group_id}/members [get]
 func (h *Handler) listMembers(c *gin.Context) {
 	userID, ok := auth.RequireUserID(c)
 	if !ok {
@@ -77,6 +106,18 @@ func (h *Handler) listMembers(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"members": toMembersResponse(members)})
 }
 
+// AddMember godoc
+// @Summary      Add member to group
+// @Tags         groups
+// @Security     BearerAuth
+// @Accept       json
+// @Param        group_id path string true "Group ID"
+// @Param        request body AddMemberRequest true "User ID to add"
+// @Success      200  {object}  map[string]interface{}  "{\"message\":\"member added\"}"
+// @Failure      400  {object}  httpapi.ErrorResponse
+// @Failure      401  {object}  httpapi.ErrorResponse
+// @Failure      403  {object}  httpapi.ErrorResponse  "Insufficient role"
+// @Router       /groups/{group_id}/members [post]
 func (h *Handler) addMember(c *gin.Context) {
 	actorID, ok := auth.RequireUserID(c)
 	if !ok {
@@ -106,6 +147,19 @@ func (h *Handler) addMember(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "member added"})
 }
 
+// UpdateMemberRole godoc
+// @Summary      Update member role (admin or member)
+// @Tags         groups
+// @Security     BearerAuth
+// @Accept       json
+// @Param        group_id path string true "Group ID"
+// @Param        user_id path string true "User ID"
+// @Param        request body UpdateMemberRoleRequest true "New role"
+// @Success      200  {object}  map[string]interface{}  "{\"message\":\"role updated\"}"
+// @Failure      400  {object}  httpapi.ErrorResponse
+// @Failure      401  {object}  httpapi.ErrorResponse
+// @Failure      403  {object}  httpapi.ErrorResponse
+// @Router       /groups/{group_id}/members/{user_id}/role [patch]
 func (h *Handler) updateMemberRole(c *gin.Context) {
 	actorID, ok := auth.RequireUserID(c)
 	if !ok {
@@ -135,6 +189,17 @@ func (h *Handler) updateMemberRole(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "role updated"})
 }
 
+// RemoveMember godoc
+// @Summary      Remove member from group
+// @Tags         groups
+// @Security     BearerAuth
+// @Param        group_id path string true "Group ID"
+// @Param        user_id path string true "User ID"
+// @Success      200  {object}  map[string]interface{}  "{\"message\":\"member removed\"}"
+// @Failure      400  {object}  httpapi.ErrorResponse
+// @Failure      401  {object}  httpapi.ErrorResponse
+// @Failure      403  {object}  httpapi.ErrorResponse
+// @Router       /groups/{group_id}/members/{user_id} [delete]
 func (h *Handler) removeMember(c *gin.Context) {
 	actorID, ok := auth.RequireUserID(c)
 	if !ok {
@@ -159,6 +224,18 @@ func (h *Handler) removeMember(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "member removed"})
 }
 
+// CreateChannel godoc
+// @Summary      Create a channel (text or voice)
+// @Tags         channels
+// @Security     BearerAuth
+// @Accept       json
+// @Produce      json
+// @Param        group_id path string true "Group ID"
+// @Param        request body CreateChannelRequest true "Channel name and type"
+// @Success      201  {object}  ChannelResponse
+// @Failure      400  {object}  httpapi.ErrorResponse
+// @Failure      401  {object}  httpapi.ErrorResponse
+// @Router       /groups/{group_id}/channels [post]
 func (h *Handler) createChannel(c *gin.Context) {
 	actorID, ok := auth.RequireUserID(c)
 	if !ok {
@@ -184,6 +261,14 @@ func (h *Handler) createChannel(c *gin.Context) {
 	c.JSON(http.StatusCreated, toChannelResponse(ch))
 }
 
+// ListChannels godoc
+// @Summary      List channels in group
+// @Tags         channels
+// @Security     BearerAuth
+// @Param        group_id path string true "Group ID"
+// @Success      200  {object}  map[string]interface{}  "{\"channels\": [...]}"
+// @Failure      401  {object}  httpapi.ErrorResponse
+// @Router       /groups/{group_id}/channels [get]
 func (h *Handler) listChannels(c *gin.Context) {
 	userID, ok := auth.RequireUserID(c)
 	if !ok {

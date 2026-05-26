@@ -24,8 +24,19 @@ func (h *Handler) RegisterRoutes(public, _ *gin.RouterGroup) {
 	g.POST("/logout", h.logout)
 }
 
+// Register godoc
+// @Summary      User registration
+// @Description  Create a new user account
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param        request body RegisterRequest true "User info"
+// @Success      201  {object}  AuthResponse
+// @Failure      400  {object}  httpapi.ErrorResponse
+// @Failure      409  {object}  httpapi.ErrorResponse  "User already exists"
+// @Router       /auth/register [post]
 func (h *Handler) register(c *gin.Context) {
-	var req registerRequest
+	var req RegisterRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, httpapi.ErrorJSON(err))
 		return
@@ -38,8 +49,19 @@ func (h *Handler) register(c *gin.Context) {
 	c.JSON(http.StatusCreated, toAuthResponse(out))
 }
 
+// Login godoc
+// @Summary      Login
+// @Description  Authenticate user and return tokens
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param        request body LoginRequest true "Credentials"
+// @Success      200  {object}  AuthResponse
+// @Failure      400  {object}  httpapi.ErrorResponse
+// @Failure      401  {object}  httpapi.ErrorResponse
+// @Router       /auth/login [post]
 func (h *Handler) login(c *gin.Context) {
-	var req loginRequest
+	var req LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, httpapi.ErrorJSON(err))
 		return
@@ -52,8 +74,19 @@ func (h *Handler) login(c *gin.Context) {
 	c.JSON(http.StatusOK, toAuthResponse(out))
 }
 
+// / Refresh godoc
+// @Summary      Refresh access token
+// @Description  Obtain new access token using refresh token
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param        request body RefreshRequest true "Refresh token"
+// @Success      200  {object}  AuthResponse
+// @Failure      400  {object}  httpapi.ErrorResponse
+// @Failure      401  {object}  httpapi.ErrorResponse
+// @Router       /auth/refresh [post]
 func (h *Handler) refresh(c *gin.Context) {
-	var req refreshRequest
+	var req RefreshRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, httpapi.ErrorJSON(err))
 		return
@@ -66,8 +99,16 @@ func (h *Handler) refresh(c *gin.Context) {
 	c.JSON(http.StatusOK, toAuthResponse(out))
 }
 
+// Logout godoc
+// @Summary      Logout
+// @Description  Invalidate refresh token (client should discard tokens)
+// @Tags         auth
+// @Security     BearerAuth
+// @Success      204  "No Content"
+// @Failure      401  {object}  httpapi.ErrorResponse
+// @Router       /auth/logout [post]
 func (h *Handler) logout(c *gin.Context) {
-	var req refreshRequest
+	var req RefreshRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, httpapi.ErrorJSON(err))
 		return

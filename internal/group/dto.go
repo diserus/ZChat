@@ -1,39 +1,39 @@
 package group
 
 type CreateGroupRequest struct {
-	Name string `json:"name" binding:"required,min=2,max=150"`
+	Name string `json:"name" binding:"required,min=2,max=150" example:"My Awesome Group" description:"Group name, 2-150 chars"`
 }
 
 type AddMemberRequest struct {
-	UserID string `json:"user_id" binding:"required,uuid"`
+	UserID string `json:"user_id" binding:"required,uuid" example:"550e8400-e29b-41d4-a716-446655440000"`
 }
 
 type UpdateMemberRoleRequest struct {
-	Role string `json:"role" binding:"required,oneof=admin member"`
+	Role string `json:"role" binding:"required,oneof=admin member" example:"admin" enums:"admin,member" description:"New role for the user"`
 }
 
 type CreateChannelRequest struct {
-	Name string `json:"name" binding:"required,min=1,max=100"`
-	Type string `json:"type" binding:"required,oneof=text voice"`
+	Name string `json:"name" binding:"required,min=1,max=100" example:"general" description:"Channel name"`
+	Type string `json:"type" binding:"required,oneof=text voice" example:"text" enums:"text,voice" description:"Channel type"`
 }
 
 type GroupResponse struct {
-	ID      string `json:"id"`
-	Name    string `json:"name"`
-	OwnerID string `json:"owner_id"`
+	ID      string `json:"id" example:"group-123"`
+	Name    string `json:"name" example:"My Awesome Group"`
+	OwnerID string `json:"owner_id" example:"user-owner-567"`
 }
 
 type MemberResponse struct {
-	GroupID string `json:"group_id"`
-	UserID  string `json:"user_id"`
-	Role    string `json:"role"`
+	GroupID string `json:"group_id" example:"group-123"`
+	UserID  string `json:"user_id" example:"user-789"`
+	Role    string `json:"role" example:"admin" enums:"admin,member"`
 }
 
 type ChannelResponse struct {
-	ID      string `json:"id"`
-	GroupID string `json:"group_id"`
-	Name    string `json:"name"`
-	Type    string `json:"type"`
+	ID      string `json:"id" example:"channel-456"`
+	GroupID string `json:"group_id" example:"group-123"`
+	Name    string `json:"name" example:"general"`
+	Type    string `json:"type" example:"text" enums:"text,voice"`
 }
 
 func toGroupResponse(g *Group) GroupResponse {

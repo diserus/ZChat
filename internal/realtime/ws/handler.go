@@ -35,6 +35,15 @@ func (h *Handler) RegisterRoutes(_ *gin.RouterGroup, protected *gin.RouterGroup)
 	protected.GET("/ws", h.handle)
 }
 
+// WebSocketConnection godoc
+// @Summary      Establish WebSocket connection
+// @Description  Upgrade to WebSocket. Requires JWT token in query param.
+// @Tags         websocket
+// @Param        token query string true "JWT access token"
+// @Success      101  "Switching Protocols"
+// @Failure      400  {object}  httpapi.ErrorResponse
+// @Failure      401  {object}  httpapi.ErrorResponse
+// @Router       /ws [get]
 func (h *Handler) handle(c *gin.Context) {
 	userID, ok := auth.RequireUserID(c)
 	if !ok {

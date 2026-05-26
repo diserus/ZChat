@@ -39,6 +39,18 @@ func (h *Handler) RegisterRoutes(_ *gin.RouterGroup, protected *gin.RouterGroup)
 	protected.POST("/channels/:channel_id/read", h.markChannelRead)
 }
 
+// CreateDirectChat godoc
+// @Summary      Create or get existing direct chat with another user
+// @Tags         direct-chats
+// @Security     BearerAuth
+// @Accept       json
+// @Produce      json
+// @Param        request body CreateDirectChatRequest true "Target user ID"
+// @Success      200  {object}  DirectChatResponse  "Existing chat"
+// @Success      201  {object}  DirectChatResponse  "Newly created chat"
+// @Failure      400  {object}  httpapi.ErrorResponse
+// @Failure      401  {object}  httpapi.ErrorResponse
+// @Router       /direct-chats [post]
 func (h *Handler) createOrGetDirect(c *gin.Context) {
 	userID, ok := auth.RequireUserID(c)
 	if !ok {
@@ -64,6 +76,19 @@ func (h *Handler) createOrGetDirect(c *gin.Context) {
 	c.JSON(http.StatusOK, toDirectChatResponse(chatRec))
 }
 
+// SendChannelMessage godoc
+// @Summary      Send a message to a text channel
+// @Tags         channels
+// @Security     BearerAuth
+// @Accept       json
+// @Produce      json
+// @Param        channel_id path string true "Channel ID"
+// @Param        request body SendMessageRequest true "Message content"
+// @Success      201  {object}  MessageResponse
+// @Failure      400  {object}  httpapi.ErrorResponse
+// @Failure      401  {object}  httpapi.ErrorResponse
+// @Failure      403  {object}  httpapi.ErrorResponse  "Not text channel"
+// @Router       /channels/{channel_id}/messages [post]
 func (h *Handler) sendChannelMessage(c *gin.Context) {
 	userID, ok := auth.RequireUserID(c)
 	if !ok {
@@ -93,6 +118,18 @@ func (h *Handler) sendChannelMessage(c *gin.Context) {
 	c.JSON(http.StatusCreated, resp)
 }
 
+// GetMessages godoc
+// @Summary      Get messages from a channel (text channels only)
+// @Tags         channels
+// @Security     BearerAuth
+// @Param        channel_id path string true "Channel ID"
+// @Param        limit query int false "Messages per page" default(50)
+// @Param        offset query int false "Offset for pagination" default(0)
+// @Success      200  {object}  map[string]interface{}  "{\"messages\": [...]}"
+// @Failure      400  {object}  httpapi.ErrorResponse
+// @Failure      401  {object}  httpapi.ErrorResponse
+// @Failure      403  {object}  httpapi.ErrorResponse  "Not text channel"
+// @Router       /channels/{channel_id}/messages [get]
 func (h *Handler) listChannelMessages(c *gin.Context) {
 	userID, ok := auth.RequireUserID(c)
 	if !ok {
@@ -116,6 +153,17 @@ func (h *Handler) listChannelMessages(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"messages": toMessagesResponse(messages)})
 }
 
+// MarkChannelRead godoc
+// @Summary      Mark a message as read in a text channel
+// @Tags         channels
+// @Security     BearerAuth
+// @Accept       json
+// @Param        channel_id path string true "Channel ID"
+// @Param        request body MarkMessageReadRequest true "Message ID to mark as read"
+// @Success      200  {object}  ReceiptResponse
+// @Failure      400  {object}  httpapi.ErrorResponse
+// @Failure      401  {object}  httpapi.ErrorResponse
+// @Router       /channels/{channel_id}/read [post]
 func (h *Handler) markChannelRead(c *gin.Context) {
 	userID, ok := auth.RequireUserID(c)
 	if !ok {
@@ -150,6 +198,18 @@ func (h *Handler) markChannelRead(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
+// SendDirectMessage godoc
+// @Summary      Send a message in a direct chat
+// @Tags         direct-chats
+// @Security     BearerAuth
+// @Accept       json
+// @Produce      json
+// @Param        direct_chat_id path string true "Direct chat ID"
+// @Param        request body SendMessageRequest true "Message content"
+// @Success      201  {object}  MessageResponse
+// @Failure      400  {object}  httpapi.ErrorResponse
+// @Failure      401  {object}  httpapi.ErrorResponse
+// @Router       /direct-chats/{direct_chat_id}/messages [post]
 func (h *Handler) sendDirectMessage(c *gin.Context) {
 	userID, ok := auth.RequireUserID(c)
 	if !ok {
@@ -179,6 +239,17 @@ func (h *Handler) sendDirectMessage(c *gin.Context) {
 	c.JSON(http.StatusCreated, resp)
 }
 
+// GetDirectMessages godoc
+// @Summary      Get messages from a direct chat
+// @Tags         direct-chats
+// @Security     BearerAuth
+// @Param        direct_chat_id path string true "Direct chat ID"
+// @Param        limit query int false "Messages per page" default(50)
+// @Param        offset query int false "Offset" default(0)
+// @Success      200  {object}  map[string]interface{}  "{\"messages\": [...]}"
+// @Failure      400  {object}  httpapi.ErrorResponse
+// @Failure      401  {object}  httpapi.ErrorResponse
+// @Router       /direct-chats/{direct_chat_id}/messages [get]
 func (h *Handler) listDirectMessages(c *gin.Context) {
 	userID, ok := auth.RequireUserID(c)
 	if !ok {
@@ -202,6 +273,17 @@ func (h *Handler) listDirectMessages(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"messages": toMessagesResponse(messages)})
 }
 
+// MarkDirectRead godoc
+// @Summary      Mark a message as read in a direct chat
+// @Tags         direct-chats
+// @Security     BearerAuth
+// @Accept       json
+// @Param        direct_chat_id path string true "Direct chat ID"
+// @Param        request body MarkMessageReadRequest true "Message ID"
+// @Success      200  {object}  ReceiptResponse
+// @Failure      400  {object}  httpapi.ErrorResponse
+// @Failure      401  {object}  httpapi.ErrorResponse
+// @Router       /direct-chats/{direct_chat_id}/read [post]
 func (h *Handler) markDirectRead(c *gin.Context) {
 	userID, ok := auth.RequireUserID(c)
 	if !ok {
